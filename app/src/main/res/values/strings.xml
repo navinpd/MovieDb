@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MovieDb</string>
+
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="search_images">Search Images</string>
+    <string name="no_data_searched">Click 🔍icon\nto download movies</string>
+    <string name="you_clicked">You Clicked Position %1$d</string>
+    <string name="ok_button">OK</string>
+</resources>
