@@ -23,12 +23,12 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/\"")
+            buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/search/\"")
             buildConfigField("String", "API_Key", "\"f7fcb1af0e061120f757e91afba158c6\"")
         }
 
         release {
-            buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/\"")
+            buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/search/\"")
             buildConfigField("String", "API_Key", "\"f7fcb1af0e061120f757e91afba158c6\"")
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -57,6 +57,7 @@ dependencies {
 
     //Image downloader
     implementation 'com.github.bumptech.glide:glide:4.9.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
     kapt "com.github.bumptech.glide:compiler:4.9.0"
 
     // Dependency injection

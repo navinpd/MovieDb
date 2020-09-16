@@ -13,12 +13,9 @@ import java.io.File
 object Networking {
 
     lateinit var API_VAL: String
-    lateinit var API_HOST_VAL: String
 
-
-    fun createNetworking(apiVal: String, apiHost: String, baseUrl: String, cascheDir: File, cascheSize: Long): NetworkService {
+    fun createNetworking(apiVal: String, baseUrl: String, cascheDir: File, cascheSize: Long): NetworkService {
         API_VAL = apiVal
-        API_HOST_VAL = apiHost
         return Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(
