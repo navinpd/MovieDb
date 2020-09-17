@@ -1,6 +1,5 @@
 package com.big.moviedb.data.remote
 
-import com.big.moviedb.data.remote.response.MovieDetails
 import com.big.moviedb.data.remote.response.MovieResults
 import io.reactivex.Single
 import retrofit2.http.GET

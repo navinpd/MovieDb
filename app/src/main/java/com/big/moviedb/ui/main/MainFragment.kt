@@ -25,7 +25,7 @@ import com.bumptech.glide.RequestManager
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
-class MainFragment : Fragment() {
+class MainFragment : Fragment() , GetNextItems {
 
     @Inject
     lateinit var mViewModel: HomeViewModel
@@ -38,6 +38,9 @@ class MainFragment : Fragment() {
     private lateinit var searchViewAdapter: SelectableViewAdapter
 
     private var currentQuery: String = ""
+
+    private var pageNumber: Int = 1
+    private var totalPageCount: Int = 1
 
     private var listOfMovieResult = mutableListOf<MovieDetails>()
 
@@ -62,10 +65,11 @@ class MainFragment : Fragment() {
                     textView.visibility = View.VISIBLE
 
                     listOfMovieResult.clear()
+                    pageNumber = 1
 
                     currentQuery = v.text.toString()
 
-                    mViewModel.getSearchResult(v.text.toString())
+                    mViewModel.getSearchResult(v.text.toString(), pageNumber)
 
                     //hide keyboard after click
                     val imm = context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -82,6 +86,8 @@ class MainFragment : Fragment() {
                 listOfMovieResult.addAll(it.results)
                 searchViewAdapter.notifyDataSetChanged()
                 textView.visibility = View.GONE
+                totalPageCount = it.total_pages
+                pageNumber = it.page
 
             } else if (it != null && it.results.isEmpty() && root != null) {
 
@@ -96,18 +102,30 @@ class MainFragment : Fragment() {
     }
 
 
+
+
     private fun setUpView(view: View) {
 
         searchView = view.findViewById(R.id.search_sv)
         progressBar = view.findViewById(R.id.progress_circle)
 
         searchViewAdapter = SelectableViewAdapter(listOfMovieResult, glide)
+        searchViewAdapter.requestForNextItem = this
 
         val recyclerView: RecyclerView = view.findViewById(R.id.search_view_rv)
         recyclerView.layoutManager = GridLayoutManager(context, 1)
         recyclerView.adapter = searchViewAdapter
     }
 
+    override fun callForNext() {
+        if (pageNumber < totalPageCount) {
+            pageNumber++
+            progressBar.visibility = View.VISIBLE
+            mViewModel.getSearchResult(
+                    currentQuery, pageNumber
+            )
+        }
+    }
     companion object {
         fun newInstance(): MainFragment {
             return MainFragment()
@@ -127,4 +145,9 @@ class MainFragment : Fragment() {
                 .inject(this)
     }
 
+}
+
+//Interface to invoke query for next set of Images
+interface GetNextItems {
+    fun callForNext()
 }

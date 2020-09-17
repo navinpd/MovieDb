@@ -31,17 +31,28 @@
         <ImageView
             android:id="@+id/poster_image"
             android:layout_width="match_parent"
-            app:layout_constraintTop_toBottomOf="@id/release_date"
             android:layout_height="240dp"
             android:layout_marginBottom="20dp"
-            android:scaleType="centerInside" />
+            android:scaleType="centerInside"
+            app:layout_constraintTop_toBottomOf="@id/release_date" />
+
+        <TextView
+            android:id="@+id/error_image_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@id/poster_image"
+            app:layout_constraintEnd_toEndOf="@id/poster_image"
+            app:layout_constraintStart_toStartOf="@id/poster_image"
+            app:layout_constraintTop_toTopOf="@id/poster_image" />
 
         <TextView
             android:id="@+id/overview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/poster_image"/>
+            app:layout_constraintTop_toBottomOf="@id/poster_image" />
 
         <ProgressBar
             android:id="@+id/progress_circle"

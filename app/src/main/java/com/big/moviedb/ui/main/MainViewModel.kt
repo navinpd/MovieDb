@@ -25,9 +25,8 @@ class HomeViewModel @Inject constructor(
 
     val getSearchResults = MutableLiveData<MovieResults>()
     private val queue = ArrayDeque<String>()
-    private val pageNumber = 1;
 
-    fun getSearchResult(query: String) {
+    fun getSearchResult(query: String, pageNumber: Int) {
 
         compositeDisposable.add(
                 networkService.searchImages(

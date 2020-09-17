@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.big.moviedb.R
 import com.big.moviedb.data.remote.response.MovieDetails
+import com.big.moviedb.ui.main.GetNextItems
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -23,9 +24,13 @@ class SelectableViewAdapter(
     private val posterUrl = "https://image.tmdb.org/t/p/w200/"
 
     override fun getItemCount() = movieListItem.size
+    lateinit var requestForNextItem: GetNextItems
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         holder.bind(movieListItem[position], position)
+        if (movieListItem.isNotEmpty() && position == movieListItem.size - 1) {
+            requestForNextItem.callForNext()
+        }
     }
 
     inner class ImageViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
@@ -34,6 +39,7 @@ class SelectableViewAdapter(
         private val releaseDate: TextView = view.findViewById(R.id.release_date)
         private val title: TextView = view.findViewById(R.id.title)
         private val overview: TextView = view.findViewById(R.id.overview)
+        private val errorImageUrl: TextView = view.findViewById(R.id.error_image_url)
 
         fun bind(movieDetails: MovieDetails, position: Int) {
 
@@ -43,7 +49,9 @@ class SelectableViewAdapter(
             releaseDate.text = "Release Date: " + movieDetails.release_date
             title.text = "Title: " + movieDetails.title
             overview.text = "OverView: " + movieDetails.overview
-            glide.load(posterUrl + movieDetails.poster_path)
+            errorImageUrl.text = posterUrl + movieDetails.poster_path
+
+            glide.load(errorImageUrl.text.toString())
                     .centerCrop()
                     .error(R.drawable.ic_error_outline_black_24dp)
                     .placeholder(R.drawable.ic_cloud_download_black_24dp)
@@ -56,6 +64,7 @@ class SelectableViewAdapter(
                                 isFirstResource: Boolean
                         ): Boolean {
                             progressCircle.visibility = View.GONE
+                            errorImageUrl.visibility = View.VISIBLE
                             return false
                         }
 
@@ -67,6 +76,7 @@ class SelectableViewAdapter(
                                 isFirstResource: Boolean
                         ): Boolean {
                             progressCircle.visibility = View.GONE
+                            errorImageUrl.visibility = View.GONE
                             return false
                         }
                     })
