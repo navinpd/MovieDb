@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.big.moviedb.BuildConfig
 import com.big.moviedb.data.remote.NetworkService
 import com.big.moviedb.data.remote.response.MovieResults
+import com.google.gson.GsonBuilder
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
@@ -16,6 +17,7 @@ class HomeViewModel @Inject constructor(
         private val compositeDisposable: CompositeDisposable,
         private val networkService: NetworkService,
         private val sharedPreferences: SharedPreferences) {
+    private val gson = GsonBuilder().create()
 
     companion object {
         const val MOVIE_KEY = "Movie_Names"

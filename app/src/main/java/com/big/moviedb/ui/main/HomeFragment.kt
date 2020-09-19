@@ -67,6 +67,7 @@ class HomeFragment : Fragment(), INextPage {
         searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
             searchedItems.clear()
             if (hasFocus) {
+                historyRecyclerView.visibility = View.VISIBLE
                 val set = mViewModel.getListFromLocal()
                 if (set != null && set.isNotEmpty()) {
                     historyAdapter.updateMovieList(ArrayList(set))
@@ -78,17 +79,7 @@ class HomeFragment : Fragment(), INextPage {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
 
                 if (v.text.toString().isNotEmpty()) {
-                    progressBar.visibility = View.VISIBLE
-                    textView.visibility = View.VISIBLE
-
-                    listOfMovieResult.clear()
-                    pageNumber = 1
-
-                    currentQuery = v.text.toString()
-
-                    mViewModel.getSearchResult(v.text.toString(), pageNumber)
-
-                    hideKeyboard()
+                    searchMovie(v.text.toString())
                 }
             }
             false
@@ -116,7 +107,22 @@ class HomeFragment : Fragment(), INextPage {
         return root
     }
 
+    private fun searchMovie(movieName: String) {
+        progressBar.visibility = View.VISIBLE
+        textView.visibility = View.VISIBLE
+
+        listOfMovieResult.clear()
+        pageNumber = 1
+
+        currentQuery = movieName
+
+        mViewModel.getSearchResult(movieName, pageNumber)
+
+        hideKeyboard()
+    }
+
     private fun hideKeyboard() {
+        historyRecyclerView.visibility = View.INVISIBLE
         val imm = context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(searchPlate.windowToken, 0)
     }
@@ -141,9 +147,10 @@ class HomeFragment : Fragment(), INextPage {
         historyRecyclerView.adapter = historyAdapter
 
         historyAdapter.setOnItemClickListener(View.OnClickListener {
-            val selectedMovie = view.tag as String
+            val selectedMovie = it.tag as String
             Toast.makeText(this.context, selectedMovie, Toast.LENGTH_SHORT).show()
-            searchView.setQuery("selectedMovie", true)
+            searchView.setQuery(selectedMovie, true)
+            searchMovie(selectedMovie)
             hideKeyboard()
         })
     }

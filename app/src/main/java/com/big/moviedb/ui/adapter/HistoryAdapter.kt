@@ -34,20 +34,20 @@ class HistoryAdapter(private val searchedItems: MutableList<String>) : RecyclerV
         holder.bind(searchedItems[position])
     }
 
-    inner class HistoryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val searchItem: TextView = view.findViewById(R.id.selectable_text)
+        private val searchItem: TextView = itemView.findViewById(R.id.selectable_text)
 
         fun bind(movieName: String) {
             itemView.tag = movieName
 
             itemView.setOnClickListener(onClickListener)
-            searchItem.text = movieName
+            this.searchItem.text = movieName
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = HistoryViewHolder(LayoutInflater.from(parent.context)
-            .inflate(R.layout.adapter_selectable_text, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = HistoryViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.adapter_selectable_text, parent, false)
     )
 
 }
