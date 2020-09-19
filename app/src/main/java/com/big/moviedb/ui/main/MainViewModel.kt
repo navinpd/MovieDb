@@ -6,11 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import com.big.moviedb.BuildConfig
 import com.big.moviedb.data.remote.NetworkService
 import com.big.moviedb.data.remote.response.MovieResults
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import java.util.ArrayDeque
+import java.util.*
 import javax.inject.Inject
 
 
@@ -20,12 +18,12 @@ class HomeViewModel @Inject constructor(
         private val sharedPreferences: SharedPreferences) {
 
     companion object {
-        val TAG: String = "HomeViewModel"
+        const val MOVIE_KEY = "Movie_Names"
+        const val TAG: String = "HomeViewModel"
     }
 
     val getSearchResults = MutableLiveData<MovieResults>()
     private val queue = ArrayDeque<String>()
-
     fun getSearchResult(query: String, pageNumber: Int) {
 
         compositeDisposable.add(
@@ -38,7 +36,7 @@ class HomeViewModel @Inject constructor(
                         .subscribe(
                                 {
                                     getSearchResults.postValue(it)
-                                    //TODO: Save this data in caching
+                                    saveDataInLocal(query)
                                     Log.d(TAG, it.toString())
                                 },
                                 {
@@ -51,10 +49,19 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    fun checkIfDataIsInLocal(query: String): String? =
-            if (sharedPreferences.contains(query)) sharedPreferences.getString(query, "") else ""
+    fun getListFromLocal(): MutableSet<String>? = sharedPreferences.getStringSet(MOVIE_KEY, null)
 
-    fun saveDataInLocal(key: String, data: String) =
-            sharedPreferences.edit().putString(key, data).apply()
+
+    fun saveDataInLocal(data: String) {
+
+        var set = getListFromLocal()
+        if (set == null) {
+            set = mutableSetOf(data)
+        } else {
+            set.add(data)
+        }
+
+        return sharedPreferences.edit().putStringSet(MOVIE_KEY, set).apply()
+    }
 
 }

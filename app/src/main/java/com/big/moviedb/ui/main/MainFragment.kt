@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -20,12 +21,14 @@ import com.big.moviedb.R
 import com.big.moviedb.data.remote.response.MovieDetails
 import com.big.moviedb.di.component.DaggerFragmentComponent
 import com.big.moviedb.di.module.MainFragmentModule
-import com.big.moviedb.ui.adapter.SelectableViewAdapter
+import com.big.moviedb.ui.adapter.HistoryAdapter
+import com.big.moviedb.ui.adapter.MovieAdapter
 import com.bumptech.glide.RequestManager
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
-class MainFragment : Fragment() , GetNextItems {
+
+class MainFragment : Fragment(), INextPage {
 
     @Inject
     lateinit var mViewModel: HomeViewModel
@@ -35,13 +38,20 @@ class MainFragment : Fragment() , GetNextItems {
 
     private lateinit var searchView: SearchView
     private lateinit var progressBar: ProgressBar
-    private lateinit var searchViewAdapter: SelectableViewAdapter
+    private lateinit var movieAdapter: MovieAdapter
+    private lateinit var historyAdapter: HistoryAdapter
+    private lateinit var textView: TextView
+    private lateinit var searchPlate: EditText
 
+    private lateinit var movieRV: RecyclerView
+    private lateinit var historyRecyclerView: RecyclerView
     private var currentQuery: String = ""
 
     private var pageNumber: Int = 1
+
     private var totalPageCount: Int = 1
 
+    private var searchedItems: ArrayList<String> = ArrayList()
     private var listOfMovieResult = mutableListOf<MovieDetails>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,9 +63,16 @@ class MainFragment : Fragment() , GetNextItems {
                               savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         setUpView(root)
-        val textView: TextView = root.findViewById(R.id.text_home)
-        val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
 
+        searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            searchedItems.clear()
+            if (hasFocus) {
+                val set = mViewModel.getListFromLocal()
+                if (set != null && set.isNotEmpty()) {
+                    historyAdapter.updateMovieList(ArrayList(set))
+                }
+            }
+        }
 
         searchPlate.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -71,9 +88,7 @@ class MainFragment : Fragment() , GetNextItems {
 
                     mViewModel.getSearchResult(v.text.toString(), pageNumber)
 
-                    //hide keyboard after click
-                    val imm = context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(searchPlate.windowToken, 0)
+                    hideKeyboard()
                 }
             }
             false
@@ -84,7 +99,7 @@ class MainFragment : Fragment() , GetNextItems {
 
             if (it != null && it.results.isNotEmpty()) {
                 listOfMovieResult.addAll(it.results)
-                searchViewAdapter.notifyDataSetChanged()
+                movieAdapter.notifyDataSetChanged()
                 textView.visibility = View.GONE
                 totalPageCount = it.total_pages
                 pageNumber = it.page
@@ -101,23 +116,39 @@ class MainFragment : Fragment() , GetNextItems {
         return root
     }
 
-
-
-
-    private fun setUpView(view: View) {
-
-        searchView = view.findViewById(R.id.search_sv)
-        progressBar = view.findViewById(R.id.progress_circle)
-
-        searchViewAdapter = SelectableViewAdapter(listOfMovieResult, glide)
-        searchViewAdapter.requestForNextItem = this
-
-        val recyclerView: RecyclerView = view.findViewById(R.id.search_view_rv)
-        recyclerView.layoutManager = GridLayoutManager(context, 1)
-        recyclerView.adapter = searchViewAdapter
+    private fun hideKeyboard() {
+        val imm = context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(searchPlate.windowToken, 0)
     }
 
-    override fun callForNext() {
+    private fun setUpView(view: View) {
+        searchedItems = ArrayList()
+
+        textView = view.findViewById(R.id.text_home)
+        searchView = view.findViewById(R.id.search_sv)
+        progressBar = view.findViewById(R.id.progress_circle)
+        searchPlate = searchView.findViewById(R.id.search_src_text)
+
+        movieRV = view.findViewById(R.id.movie_item_list)
+        movieRV.layoutManager = GridLayoutManager(context, 1)
+        movieAdapter = MovieAdapter(listOfMovieResult, glide)
+        movieRV.adapter = movieAdapter
+        movieAdapter.requestForNextItem = this
+
+        historyRecyclerView = view.findViewById(R.id.history_item_list)
+        historyRecyclerView.layoutManager = GridLayoutManager(context, 1)
+        historyAdapter = HistoryAdapter(searchedItems)
+        historyRecyclerView.adapter = historyAdapter
+
+        historyAdapter.setOnItemClickListener(View.OnClickListener {
+            val selectedMovie = view.tag as String
+            Toast.makeText(this.context, selectedMovie, Toast.LENGTH_SHORT).show()
+            searchView.setQuery("selectedMovie", true)
+            hideKeyboard()
+        })
+    }
+
+    override fun loadNextPage() {
         if (pageNumber < totalPageCount) {
             pageNumber++
             progressBar.visibility = View.VISIBLE
@@ -126,6 +157,7 @@ class MainFragment : Fragment() , GetNextItems {
             )
         }
     }
+
     companion object {
         fun newInstance(): MainFragment {
             return MainFragment()
@@ -148,6 +180,6 @@ class MainFragment : Fragment() , GetNextItems {
 }
 
 //Interface to invoke query for next set of Images
-interface GetNextItems {
-    fun callForNext()
+interface INextPage {
+    fun loadNextPage()
 }

@@ -44,6 +44,6 @@ class ApplicationModule(private val application: MyApplication) {
     @Provides
     @Singleton
     fun provideSharedPreference(): SharedPreferences =
-        application.getSharedPreferences("Local-Shared-Pref", 0)
+        application.getSharedPreferences("Local-Shared-Pref", Context.MODE_PRIVATE)
 
 }

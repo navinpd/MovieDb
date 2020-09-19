@@ -10,30 +10,30 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.big.moviedb.R
 import com.big.moviedb.data.remote.response.MovieDetails
-import com.big.moviedb.ui.main.GetNextItems
+import com.big.moviedb.ui.main.INextPage
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 
-class SelectableViewAdapter(
+class MovieAdapter(
         private var movieListItem: MutableList<MovieDetails>,
-        private var glide: RequestManager) : RecyclerView.Adapter<SelectableViewAdapter.ImageViewHolder>() {
+        private var glide: RequestManager) : RecyclerView.Adapter<MovieAdapter.DataViewHolder>() {
 
     var onClickListener: View.OnClickListener? = null
     private val posterUrl = "https://image.tmdb.org/t/p/w200/"
 
     override fun getItemCount() = movieListItem.size
-    lateinit var requestForNextItem: GetNextItems
+    lateinit var requestForNextItem: INextPage
 
-    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: DataViewHolder, position: Int) {
         holder.bind(movieListItem[position], position)
         if (movieListItem.isNotEmpty() && position == movieListItem.size - 1) {
-            requestForNextItem.callForNext()
+            requestForNextItem.loadNextPage()
         }
     }
 
-    inner class ImageViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    inner class DataViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val selectableImage: ImageView = view.findViewById(R.id.poster_image)
         private val progressCircle: ProgressBar = view.findViewById(R.id.progress_circle)
         private val releaseDate: TextView = view.findViewById(R.id.release_date)
@@ -84,7 +84,7 @@ class SelectableViewAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ImageViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = DataViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.adapter_poster_card, parent, false)
     )
 
