@@ -28,7 +28,7 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
 
-class MainFragment : Fragment(), INextPage {
+class HomeFragment : Fragment(), INextPage {
 
     @Inject
     lateinit var mViewModel: HomeViewModel
@@ -159,8 +159,8 @@ class MainFragment : Fragment(), INextPage {
     }
 
     companion object {
-        fun newInstance(): MainFragment {
-            return MainFragment()
+        fun newInstance(): HomeFragment {
+            return HomeFragment()
         }
     }
 

@@ -52,7 +52,7 @@ class HomeViewModel @Inject constructor(
     fun getListFromLocal(): MutableSet<String>? = sharedPreferences.getStringSet(MOVIE_KEY, null)
 
 
-    fun saveDataInLocal(data: String) {
+    private fun saveDataInLocal(data: String): Boolean {
 
         var set = getListFromLocal()
         if (set == null) {
@@ -61,7 +61,7 @@ class HomeViewModel @Inject constructor(
             set.add(data)
         }
 
-        return sharedPreferences.edit().putStringSet(MOVIE_KEY, set).apply()
+        return sharedPreferences.edit().putStringSet(MOVIE_KEY, set).commit()
     }
 
 }

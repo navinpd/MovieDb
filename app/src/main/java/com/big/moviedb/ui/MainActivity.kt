@@ -6,7 +6,7 @@ import com.big.moviedb.MyApplication
 import com.big.moviedb.R
 import com.big.moviedb.di.component.DaggerActivityComponent
 import com.big.moviedb.di.module.ActivityModule
-import com.big.moviedb.ui.main.MainFragment
+import com.big.moviedb.ui.main.HomeFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, MainFragment.newInstance())
+                    .replace(R.id.container, HomeFragment.newInstance())
                     .commitNow()
         }
     }
