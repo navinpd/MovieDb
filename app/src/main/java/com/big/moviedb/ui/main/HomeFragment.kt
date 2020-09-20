@@ -68,9 +68,11 @@ class HomeFragment : Fragment(), INextPage {
             searchedItems.clear()
             if (hasFocus) {
                 historyRecyclerView.visibility = View.VISIBLE
-                val set = mViewModel.getListFromLocal()
-                if (set != null && set.isNotEmpty()) {
-                    historyAdapter.updateMovieList(ArrayList(set))
+                val savedList = mViewModel.getListFromLocal()
+
+                if (savedList != null && savedList.isNotEmpty()) {
+                    savedList.remove("")
+                    historyAdapter.updateMovieList(ArrayList(savedList))
                 }
             }
         }

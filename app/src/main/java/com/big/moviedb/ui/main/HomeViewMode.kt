@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import com.big.moviedb.BuildConfig
 import com.big.moviedb.data.remote.NetworkService
 import com.big.moviedb.data.remote.response.MovieResults
-import com.google.gson.GsonBuilder
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
@@ -17,7 +16,6 @@ class HomeViewModel @Inject constructor(
         private val compositeDisposable: CompositeDisposable,
         private val networkService: NetworkService,
         private val sharedPreferences: SharedPreferences) {
-    private val gson = GsonBuilder().create()
 
     companion object {
         const val MOVIE_KEY = "Movie_Names"
@@ -33,8 +31,7 @@ class HomeViewModel @Inject constructor(
                         apiKey = BuildConfig.API_Key,
                         querySearch = query,
                         pageNumber = pageNumber
-                )
-                        .subscribeOn(Schedulers.io())
+                ).subscribeOn(Schedulers.io())
                         .subscribe(
                                 {
                                     getSearchResults.postValue(it)
@@ -50,20 +47,40 @@ class HomeViewModel @Inject constructor(
         )
     }
 
+    fun getListFromLocal(): ArrayList<String>? {
 
-    fun getListFromLocal(): MutableSet<String>? = sharedPreferences.getStringSet(MOVIE_KEY, null)
+        val data = sharedPreferences.getString(MOVIE_KEY, "")
+        return ArrayList<String>(data!!.split(","))
+    }
 
-
-    private fun saveDataInLocal(data: String) {
-
-        var set = getListFromLocal()
-        if (set == null) {
-            set = mutableSetOf(data)
-        } else {
-            set.add(data)
+    fun saveDataInLocal(data: String) {
+        if (data.isEmpty()) {
+            return
         }
+        val localMovieData = getListFromLocal()
 
-        return sharedPreferences.edit().putStringSet(MOVIE_KEY, set).apply()
+        if (localMovieData!!.contains(data))
+            return
+
+        localMovieData!!.add(0, data)
+        val regex = ","
+        val joined: String = join(regex, localMovieData)
+
+        return sharedPreferences.edit().putString(MOVIE_KEY, joined).apply()
+    }
+
+    private fun join(delimiter: CharSequence, tokens: Iterable<*>): String {
+        val it = tokens.iterator()
+        if (!it.hasNext()) {
+            return ""
+        }
+        val sb = StringBuilder()
+        sb.append(it.next())
+        while (it.hasNext()) {
+            sb.append(delimiter)
+            sb.append(it.next())
+        }
+        return sb.toString()
     }
 
 }
