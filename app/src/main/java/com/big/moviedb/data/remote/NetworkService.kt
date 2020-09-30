@@ -1,7 +1,7 @@
 package com.big.moviedb.data.remote
 
 import com.big.moviedb.data.remote.response.MovieResults
-import io.reactivex.Single
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -14,6 +14,6 @@ interface NetworkService {
             @Query(Endpoints.QUERY_API_KEY) apiKey: String,
             @Query(Endpoints.QUERY_QUERY) querySearch: String,
             @Query(Endpoints.QUERY_PAGE) pageNumber: Int
-    ): Single<MovieResults>
+    ): Call<MovieResults>
 
 }

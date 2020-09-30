@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
+import com.big.moviedb.data.Repository;
 import com.big.moviedb.data.remote.NetworkService;
+import com.big.moviedb.data.remote.response.MovieResults;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,10 +20,12 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import io.reactivex.disposables.CompositeDisposable;
 import kotlin.jvm.JvmField;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -36,11 +40,18 @@ public class HomeViewModelTest {
     public TestRule rule = new InstantTaskExecutorRule();
     @Mock
     @JvmField
-    public NetworkService networkService = null;
+    public SharedPreferences sharedPreferences = null;
     @Mock
     @JvmField
-    public SharedPreferences sharedPreferences = null;
-    private CompositeDisposable compositeDisposable = null;
+    public Repository repository = null;
+
+    @Mock
+    @JvmField
+    public Call<MovieResults> value = null;
+
+    @Mock
+    @JvmField
+    public NetworkService networkService = null;
 
     private HomeViewModel homeViewModel = null;
 
@@ -48,11 +59,11 @@ public class HomeViewModelTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        compositeDisposable = new CompositeDisposable();
         homeViewModel =
-                new HomeViewModel(compositeDisposable, networkService, sharedPreferences);
-    }
+                new HomeViewModel(sharedPreferences, repository);
 
+
+    }
 
     /*
       Test to check if created items are null or not
@@ -60,7 +71,6 @@ public class HomeViewModelTest {
     @Test
     public void _01TestNonNull() {
         assert (homeViewModel != null);
-        assert (networkService != null);
         assert (sharedPreferences != null);
     }
 
@@ -128,9 +138,7 @@ public class HomeViewModelTest {
 
     @After
     public void tearDown() {
-        compositeDisposable = null;
         homeViewModel = null;
-        networkService = null;
         sharedPreferences = null;
     }
 

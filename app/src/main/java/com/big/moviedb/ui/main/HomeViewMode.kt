@@ -1,50 +1,31 @@
 package com.big.moviedb.ui.main
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.big.moviedb.BuildConfig
+import com.big.moviedb.data.Repository
 import com.big.moviedb.data.remote.NetworkService
 import com.big.moviedb.data.remote.response.MovieResults
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import java.util.*
 import javax.inject.Inject
 
 
 class HomeViewModel @Inject constructor(
-        private val compositeDisposable: CompositeDisposable,
-        private val networkService: NetworkService,
-        private val sharedPreferences: SharedPreferences) {
+        private val sharedPreferences: SharedPreferences,
+        private val repository: Repository) {
 
     companion object {
         const val MOVIE_KEY = "Movie_Names"
         const val TAG: String = "HomeViewModel"
     }
 
-    val getSearchResults = MutableLiveData<MovieResults>()
-    private val queue = ArrayDeque<String>()
-    fun getSearchResult(query: String, pageNumber: Int) {
+    var getSearchResults = repository.mutableLiveData
 
-        compositeDisposable.add(
-                networkService.searchImages(
-                        apiKey = BuildConfig.API_Key,
-                        querySearch = query,
-                        pageNumber = pageNumber
-                ).subscribeOn(Schedulers.io())
-                        .subscribe(
-                                {
-                                    getSearchResults.postValue(it)
-                                    saveDataInLocal(query)
-                                    Log.d(TAG, it.toString())
-                                },
-                                {
-                                    queue.poll()
-                                    getSearchResults.postValue(null)
-                                    Log.d(TAG, it.toString())
-                                }
-                        )
-        )
+
+    fun getSearchResult(query: String, pageNumber: Int) {
+        repository.getServerResponse(query, pageNumber)
+
     }
 
     fun getListFromLocal(): ArrayList<String>? {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.big.moviedb.BuildConfig
 import com.big.moviedb.MyApplication
+import com.big.moviedb.data.Repository
 import com.big.moviedb.data.remote.NetworkService
 import com.big.moviedb.data.remote.Networking
 import com.big.moviedb.di.ApplicationContext
@@ -25,25 +26,28 @@ class ApplicationModule(private val application: MyApplication) {
     @Provides
     fun provideCompositeDisposable(): CompositeDisposable = CompositeDisposable()
 
-
     @Provides
     @Singleton
-    fun provideGlide() : RequestManager = Glide.with(application)
+    fun provideGlide(): RequestManager = Glide.with(application)
 
     @Provides
     @Singleton
     fun provideNetworking(): NetworkService {
         return Networking.createNetworking(
-            BuildConfig.API_Key,
-            BuildConfig.BASE_URL,
-            application.cacheDir,
-            10 * 1024 * 1024
+                BuildConfig.API_Key,
+                BuildConfig.BASE_URL,
+                application.cacheDir,
+                10 * 1024 * 1024
         )
     }
 
     @Provides
     @Singleton
     fun provideSharedPreference(): SharedPreferences =
-        application.getSharedPreferences("Local-Shared-Pref", Context.MODE_PRIVATE)
+            application.getSharedPreferences("Local-Shared-Pref", Context.MODE_PRIVATE)
 
+    @Provides
+    @Singleton
+    fun provideRepository(): Repository =
+            Repository(provideNetworking())
 }

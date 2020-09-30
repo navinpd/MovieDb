@@ -3,6 +3,7 @@ package com.big.moviedb.di.component
 import android.content.Context
 import android.content.SharedPreferences
 import com.big.moviedb.MyApplication
+import com.big.moviedb.data.Repository
 import com.big.moviedb.data.remote.NetworkService
 import com.big.moviedb.di.ApplicationContext
 import com.big.moviedb.di.module.ApplicationModule
@@ -27,5 +28,7 @@ interface ApplicationComponent {
     fun getPrefStore(): SharedPreferences
 
     fun getGlide(): RequestManager
+
+    fun getRepository() : Repository
 
 }
