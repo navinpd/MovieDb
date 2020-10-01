@@ -6,6 +6,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.big.moviedb.BuildConfig.API_Key
 import com.big.moviedb.data.remote.NetworkService
+import com.big.moviedb.data.remote.response.MovieDetails
 import com.big.moviedb.data.remote.response.MovieResults
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -81,6 +82,7 @@ internal class RepositoryTest {
     @Test
     fun testServerResponse_Success_200() {
         val observer: Observer<MovieResults> = mock(Observer::class.java) as Observer<MovieResults>
+        val movieResults = buildMovieResult()
 
         // Mocking
         `when`(networkService!!.searchImages(apiKey = API_Key, querySearch = "Rocky", pageNumber = 1))
@@ -94,6 +96,7 @@ internal class RepositoryTest {
         // Mocking the server response
         `when`(response!!.code()).thenReturn(200)
         `when`(response!!.isSuccessful).thenReturn(true)
+        `when`(response!!.body()).thenReturn(movieResults)
 
         // Actual Invocation
         repository = Repository(networkService!!)
@@ -105,6 +108,13 @@ internal class RepositoryTest {
         assertEquals(repository!!.mutableLiveData.value, null)
         assertEquals(response!!.code(), 200)
         assertEquals(response!!.isSuccessful, true)
+        assertEquals(response!!.body()?.page, movieResults.page)
+        assertEquals(response!!.body()?.total_results, movieResults.total_results)
+    }
+
+    private fun buildMovieResult(): MovieResults {
+        var list: ArrayList<MovieDetails> = ArrayList()
+        var movieResults = MovieResults(1, 20, 10, list)
     }
 
 
