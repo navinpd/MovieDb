@@ -10,29 +10,32 @@ import javax.inject.Inject
 
 
 class Repository @Inject constructor(private val networkService: NetworkService) {
-
+    val TAG = "Repository"
     val mutableLiveData: MutableLiveData<MovieResults> = MutableLiveData()
 
     public fun getServerResponse(query: String, pageNumber: Int) {
-        networkService
-                .searchImages(
-                        apiKey = BuildConfig.API_Key,
-                        querySearch = query,
-                        pageNumber = pageNumber)
-                .enqueue(object : Callback<MovieResults> {
-                    override fun onResponse(call: retrofit2.Call<MovieResults>,
-                                            response: retrofit2.Response<MovieResults>) {
-                        if (!response.isSuccessful || response.code() != 200) {
-                            mutableLiveData.postValue(null)
-                        } else {
-                            mutableLiveData.postValue(response.body())
-                        }
-                    }
+        val data = networkService.searchImages(
+                apiKey = BuildConfig.API_Key,
+                querySearch = query,
+                pageNumber = pageNumber)
 
-                    override fun onFailure(call: retrofit2.Call<MovieResults>, t: Throwable) {
-                        Log.e("Repository", t.localizedMessage)
-                        mutableLiveData.postValue(null)
-                    }
-                });
+        data.enqueue(object : Callback<MovieResults> {
+            override fun onResponse(call: retrofit2.Call<MovieResults>,
+                                    response: retrofit2.Response<MovieResults>) {
+                Log.d(TAG, "ServerResponse is " + response.isSuccessful)
+                Log.d(TAG, "ServerResponse successCode " + response.code())
+
+                if (!response.isSuccessful || response.code() != 200) {
+                    mutableLiveData.postValue(null)
+                } else {
+                    mutableLiveData.postValue(response.body())
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<MovieResults>, t: Throwable) {
+                Log.e(TAG, t.localizedMessage)
+                mutableLiveData.postValue(null)
+            }
+        });
     }
 }
