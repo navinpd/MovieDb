@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 
 class Repository @Inject constructor(private val networkService: NetworkService) {
-    val TAG = "Repository"
+    private val TAG = "Repository"
     val mutableLiveData: MutableLiveData<MovieResults> = MutableLiveData()
 
     public fun getServerResponse(query: String, pageNumber: Int) {
@@ -22,19 +22,17 @@ class Repository @Inject constructor(private val networkService: NetworkService)
         data.enqueue(object : Callback<MovieResults> {
             override fun onResponse(call: retrofit2.Call<MovieResults>,
                                     response: retrofit2.Response<MovieResults>) {
-                Log.d(TAG, "ServerResponse is " + response.isSuccessful)
-                Log.d(TAG, "ServerResponse successCode " + response.code())
 
                 if (!response.isSuccessful || response.code() != 200) {
-                    mutableLiveData.postValue(null)
+                    mutableLiveData.setValue(null)
                 } else {
-                    mutableLiveData.postValue(response.body())
+                    mutableLiveData.setValue(response.body())
                 }
             }
 
             override fun onFailure(call: retrofit2.Call<MovieResults>, t: Throwable) {
                 Log.e(TAG, t.localizedMessage)
-                mutableLiveData.postValue(null)
+                mutableLiveData.setValue(null)
             }
         });
     }
