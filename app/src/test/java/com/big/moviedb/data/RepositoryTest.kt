@@ -6,7 +6,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.big.moviedb.BuildConfig.API_Key
 import com.big.moviedb.data.remote.NetworkService
-import com.big.moviedb.data.remote.response.MovieDetails
 import com.big.moviedb.data.remote.response.MovieResults
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -104,18 +103,15 @@ internal class RepositoryTest {
         repository!!.getServerResponse("Rocky", 1)
 
         // Verification
-        verify(observer).onChanged(null)
-        assertEquals(repository!!.mutableLiveData.value, null)
+        verify(observer).onChanged(movieResults)
+        assertEquals(repository!!.mutableLiveData.value, movieResults)
         assertEquals(response!!.code(), 200)
         assertEquals(response!!.isSuccessful, true)
         assertEquals(response!!.body()?.page, movieResults.page)
         assertEquals(response!!.body()?.total_results, movieResults.total_results)
     }
 
-    private fun buildMovieResult(): MovieResults {
-        var list: ArrayList<MovieDetails> = ArrayList()
-        var movieResults = MovieResults(1, 20, 10, list)
-    }
+    private fun buildMovieResult(): MovieResults = MovieResults(1, 20, 10, ArrayList())
 
 
     @Before
