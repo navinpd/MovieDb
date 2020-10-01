@@ -50,7 +50,7 @@ internal class RepositoryTest {
     var response: Response<MovieResults>? = null
 
     @Test
-    fun testServerResponse() {
+    fun testServerResponse_Fail_404() {
         val observer: Observer<MovieResults> = mock(Observer::class.java) as Observer<MovieResults>
 
         // Mocking
@@ -75,6 +75,35 @@ internal class RepositoryTest {
         verify(observer).onChanged(null)
         assertEquals(repository!!.mutableLiveData.value, null)
         assertEquals(response!!.code(), 404)
+        assertEquals(response!!.isSuccessful, true)
+    }
+
+    @Test
+    fun testServerResponse_Success_200() {
+        val observer: Observer<MovieResults> = mock(Observer::class.java) as Observer<MovieResults>
+
+        // Mocking
+        `when`(networkService!!.searchImages(apiKey = API_Key, querySearch = "Rocky", pageNumber = 1))
+                .thenReturn(serverCall)
+
+        `when`(serverCall!!.enqueue(any())).then {
+            (it.arguments[0] as Callback<MovieResults>)
+                    .onResponse(call, response)
+        }
+
+        // Mocking the server response
+        `when`(response!!.code()).thenReturn(200)
+        `when`(response!!.isSuccessful).thenReturn(true)
+
+        // Actual Invocation
+        repository = Repository(networkService!!)
+        repository!!.mutableLiveData.observeForever(observer)
+        repository!!.getServerResponse("Rocky", 1)
+
+        // Verification
+        verify(observer).onChanged(null)
+        assertEquals(repository!!.mutableLiveData.value, null)
+        assertEquals(response!!.code(), 200)
         assertEquals(response!!.isSuccessful, true)
     }
 

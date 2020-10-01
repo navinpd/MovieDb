@@ -49,10 +49,6 @@ public class HomeViewModelTest {
     @JvmField
     public Call<MovieResults> value = null;
 
-    @Mock
-    @JvmField
-    public NetworkService networkService = null;
-
     private HomeViewModel homeViewModel = null;
 
 
