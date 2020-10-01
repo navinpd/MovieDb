@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.big.moviedb.data.Repository;
-import com.big.moviedb.data.remote.NetworkService;
-import com.big.moviedb.data.remote.response.MovieResults;
 
 import org.junit.After;
 import org.junit.Before;
@@ -19,13 +17,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import kotlin.jvm.JvmField;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -45,10 +44,6 @@ public class HomeViewModelTest {
     @JvmField
     public Repository repository = null;
 
-    @Mock
-    @JvmField
-    public Call<MovieResults> value = null;
-
     private HomeViewModel homeViewModel = null;
 
 
@@ -65,17 +60,17 @@ public class HomeViewModelTest {
       Test to check if created items are null or not
      */
     @Test
-    public void _01TestNonNull() {
+    public void _01TestNonNullMockItems() {
         assert (homeViewModel != null);
         assert (sharedPreferences != null);
     }
 
 
     /*
-      Test to check if shared preference don't contain any item and we want to save a city
+      Test to check if shared preference don't contain any item and we want to save a movie
      */
     @Test
-    public void _02TestSaveToLocalFirstItem() {
+    public void _02TestDataSaveToSharedPref() {
         //Mocking
         SharedPreferences.Editor editor = Mockito.mock(SharedPreferences.Editor.class);
 
@@ -91,36 +86,12 @@ public class HomeViewModelTest {
         verify(editor, times(1)).putString(anyString(), anyString());
         verify(editor, times(1)).apply();
     }
-
-    /*
-      Test to check if shared preference contains multiple item and we want to save a city
-     */
-    @Test
-    public void _03TestSaveToLocalMultipleItem() {
-        //Mocking
-        SharedPreferences.Editor editor = Mockito.mock(SharedPreferences.Editor.class);
-        when(sharedPreferences.edit()).thenReturn(editor);
-
-        when(editor.putString(anyString(), anyString())).thenReturn(editor);
-
-        when(sharedPreferences.getString("Movie_Names", "")).thenReturn("");
-
-        doNothing().when(editor).apply();
-
-        //Action
-        homeViewModel.saveDataInLocal("ROCKY");
-
-        //Verify
-        verify(editor, times(1)).putString(anyString(), anyString());
-        verify(editor, times(1)).apply();
-    }
-
 
     /*
       Test to check if we pass empty city will it be saved in local preference
      */
     @Test
-    public void _04TestSaveToLocalNoItem() {
+    public void _03TestSaveToSharedPrefEmptyItem() {
         //Mocking
         SharedPreferences.Editor editor = Mockito.mock(SharedPreferences.Editor.class);
 
@@ -130,6 +101,11 @@ public class HomeViewModelTest {
         //Verify
         verify(editor, times(0)).putString(anyString(), anyString());
         verify(editor, times(0)).apply();
+    }
+
+    @Test
+    public void  _04TestServerResponse() {
+
     }
 
     @After

@@ -9,7 +9,7 @@ import retrofit2.Callback
 import javax.inject.Inject
 
 
-class Repository @Inject constructor(private val networkService: NetworkService) {
+open class Repository @Inject constructor(private val networkService: NetworkService) {
     private val TAG = "Repository"
     val mutableLiveData: MutableLiveData<MovieResults> = MutableLiveData()
 

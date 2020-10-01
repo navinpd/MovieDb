@@ -25,7 +25,6 @@ class HomeViewModel @Inject constructor(
 
     fun getSearchResult(query: String, pageNumber: Int) {
         repository.getServerResponse(query, pageNumber)
-
     }
 
     fun getListFromLocal(): ArrayList<String>? {
